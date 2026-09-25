@@ -2,10 +2,11 @@ import argparse
 import base64
 import hashlib
 import os
-from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric import ec, rsa, padding
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 def codify_operations(text, mode):
@@ -23,21 +24,71 @@ def codify_operations(text, mode):
     return f"Error: {e}"
 
 
+def aes_gcm_encrypt(plaintext):
+  """Cifrado simétrico moderno de grado industrial (AES-256-GCM)."""
+  print("\n[*] Módulo de Cifrado Simétrico (AES-256-GCM):")
+  print("-" * 65)
+  key = AESGCM.generate_key(bit_length=256)
+  aesgcm = AESGCM(key)
+  nonce = os.urandom(12)
+  
+  ciphertext = aesgcm.encrypt(nonce, plaintext.encode("utf-8"), None)
+  
+  print(f"    [+] Llave Secreta (Hex) : {key.hex()}")
+  print(f"    [+] Nonce (Hex)         : {nonce.hex()}")
+  print(f"    [+] Texto Cifrado (Hex) : {ciphertext.hex()}")
+  print("    [i] Nota: AES-GCM provee confidencialidad e integridad autenticada.")
+  print("-" * 65)
+
+
+def rsa_asymmetric_operations(message):
+  """Cifrado Asimétrico Real con RSA (2048 bits + OAEP padding)."""
+  print("\n[*] Módulo de Cifrado Asimétrico (RSA-2048 / OAEP):")
+  print("-" * 65)
+  private_key = rsa.generate_private_key(
+      public_exponent=65537,
+      key_size=2048
+  )
+  public_key = private_key.public_key()
+
+  ciphertext = public_key.encrypt(
+      message.encode("utf-8"),
+      padding.OAEP(
+          mgf=padding.MGF1(algorithm=hashes.SHA256()),
+          algorithm=hashes.SHA256(),
+          label=None
+      )
+  )
+
+  decrypted_message = private_key.decrypt(
+      ciphertext,
+      padding.OAEP(
+          mgf=padding.MGF1(algorithm=hashes.SHA256()),
+          algorithm=hashes.SHA256(),
+          label=None
+      )
+  )
+
+  print(f"    [+] Mensaje Original    : {message}")
+  print(f"    [+] Texto Cifrado (Hex) : {ciphertext.hex()[:60]}... [Truncado]")
+  print(f"    [+] Mensaje Descifrado  : {decrypted_message.decode('utf-8')}")
+  print("-" * 65)
+
+
 def generate_hashes(text):
-  """Hashes tradicionales y funciones pesadas derivadas (Estilo Yescrypt/Argon2)."""
+  """Hashes tradicionales y KDF pesado."""
   print("\n[*] Generando huellas y hashes de alta seguridad:")
   print("-" * 65)
   print(f"    [MD5]       : {hashlib.md5(text.encode()).hexdigest()}")
   print(f"    [SHA-256]   : {hashlib.sha256(text.encode()).hexdigest()}")
   print(f"    [SHA-512]   : {hashlib.sha512(text.encode()).hexdigest()}")
   
-  # Simulación de derivación de clave pesada (Resistente a GPU, similar al propósito de Yescrypt)
   salt = os.urandom(16)
   kdf = PBKDF2HMAC(
       algorithm=hashes.SHA256(),
       length=32,
       salt=salt,
-      iterations=100000, # Alta carga computacional
+      iterations=100000,
   )
   heavy_hash = kdf.derive(text.encode())
   print(f"    [Heavy-KDF] : {heavy_hash.hex()} (Sal: {salt.hex()})")
@@ -45,27 +96,23 @@ def generate_hashes(text):
 
 
 def elliptic_curve_crypto():
-  """Generación de llaves usando Criptografía de Curva Elíptica (ECC - SECP256R1)."""
+  """Curvas Elípticas (ECC - SECP256R1)."""
   print("\n[*] Módulo de Criptografía de Curva Elíptica (ECC):")
   print("-" * 65)
-  # Generar clave privada usando la curva estándar NIST P-256 (secp256r1)
   private_key = ec.generate_private_key(ec.SECP256R1())
   public_key = private_key.public_key()
 
-  # Serializar llave privada PEM
   pem_private = private_key.private_bytes(
       encoding=serialization.Encoding.PEM,
       format=serialization.PrivateFormat.PKCS8,
       encryption_algorithm=serialization.NoEncryption()
   )
-
-  # Serializar llave pública PEM
   pem_public = public_key.public_bytes(
       encoding=serialization.Encoding.PEM,
       format=serialization.PublicFormat.SubjectPublicKeyInfo
   )
 
-  print("    [+] Llave Privada ECC generada con éxito:")
+  print("    [+] Llave Privada ECC generada:")
   print(pem_private.decode("utf-8").strip())
   print("\n    [+] Llave Pública ECC correspondiente:")
   print(pem_public.decode("utf-8").strip())
@@ -73,38 +120,34 @@ def elliptic_curve_crypto():
 
 
 def post_quantum_simulation(text):
-  """Simulador conceptual de Criptografía Poscuántica (Resistente a Shor/Grover)."""
-  print("\n[*] Módulo de Criptografía Poscuántica (PQC - Lattice/Hash Based):")
+  """Simulador Post-Cuántico (PQC)."""
+  print("\n[*] Módulo de Criptografía Poscuántica (PQC):")
   print("-" * 65)
-  print("    [i] Estado: Analizando resistencia frente a computación cuántica...")
-  print("    [i] Algoritmo simulado: Winternitz One-Time Signature (WOTS+) / Lattice-based Hash")
-  
-  # Generar un hash resistente a cuántica usando SHA3-512 (Kangaroot/Keccak - considerado seguro ante Grover)
   q_hash = hashlib.sha3_512(text.encode()).hexdigest()
   print(f"    [+] Hash Post-Cuántico (SHA3-512): {q_hash}")
-  print("    [+] Nota: Las firmas basadas en retículas y hashes mitigan el Algoritmo de Shor.")
+  print("    [+] Resistencia frente a algoritmos de Shor y Grover.")
   print("-" * 65)
 
 
 def main():
   parser = argparse.ArgumentParser(
-      description="Crypstofus - Herramienta avanzada de Criptografía y Ciberseguridad"
+      description="Crypstofus v3.0 - Suite Criptográfica de Grado Industrial"
   )
   parser.add_argument(
-      "-t", "--text", required=False, help="Texto o cadena de entrada para procesar"
+      "-t", "--text", required=False, help="Texto o datos de entrada"
   )
   parser.add_argument(
       "-m",
       "--mode",
       required=True,
-      choices=["b64-enc", "b64-dec", "hex-enc", "hex-dec", "hash", "ecc", "pqc"],
-      help="Modo criptográfico avanzado a ejecutar",
+      choices=["b64-enc", "b64-dec", "hex-enc", "hex-dec", "hash", "aes", "rsa", "ecc", "pqc"],
+      help="Modo criptográfico industrial a ejecutar",
   )
 
   args = parser.parse_args()
 
   print("=================================================================")
-  print("          CRYPTOFUS v2.0 - SUITE CRIPTOGRÁFICA AVANZADA          ")
+  print("          CRYPTOFUS v3.0 - SUITE INDUSTRIAL & MODERNA           ")
   print("=================================================================")
   if args.text:
     print(f"[*] Entrada: {args.text}")
@@ -113,19 +156,29 @@ def main():
 
   if args.mode in ["b64-enc", "b64-dec", "hex-enc", "hex-dec"]:
     if not args.text:
-      print("[-] Error: El modo de codificación requiere un texto (-t).")
+      print("[-] Error: Requiere texto (-t).")
       return
     print(f"[+] Resultado: {codify_operations(args.text, args.mode)}")
   elif args.mode == "hash":
     if not args.text:
-      print("[-] Error: El modo hash requiere una entrada de texto (-t).")
+      print("[-] Error: Requiere texto (-t).")
       return
     generate_hashes(args.text)
+  elif args.mode == "aes":
+    if not args.text:
+      print("[-] Error: Requiere texto (-t) para cifrar con AES-GCM.")
+      return
+    aes_gcm_encrypt(args.text)
+  elif args.mode == "rsa":
+    if not args.text:
+      print("[-] Error: Requiere texto (-t) para probar cifrado RSA.")
+      return
+    rsa_asymmetric_operations(args.text)
   elif args.mode == "ecc":
     elliptic_curve_crypto()
   elif args.mode == "pqc":
     if not args.text:
-      args.text = "DefaultQuantumSeed2026"
+      args.text = "QuantumSeed2026"
     post_quantum_simulation(args.text)
 
 
