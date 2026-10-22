@@ -4,8 +4,12 @@ import json
 import base64
 import random
 import secrets
+import datetime
 from pathlib import Path
 
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, ec
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305
@@ -48,7 +52,7 @@ def modulo_primos():
             break
 
 # =====================================================================
-# MÓDULO 2: DIFFIE-HELLMAN (Intercambio Seguro - RECUPERADO)
+# MÓDULO 2: DIFFIE-HELLMAN (Intercambio Seguro)
 # =====================================================================
 def dh_exchange(p, g, private_key):
     return pow(g, private_key, p)
@@ -59,10 +63,8 @@ def dh_shared_secret(public_received, private_key, p):
 def modulo_diffie_hellman():
     print("\n--- 2. DIFFIE-HELLMAN: Intercambio de Claves Matemático ---")
     print("[*] Simulando parámetros públicos (P y G)...")
-    # En la vida real, P es un primo de 2048 bits. Usamos uno chico para el ejemplo.
     p = 23  # Módulo primo público
     g = 5   # Base pública
-    
     print(f"Parámetros públicos en la red -> P: {p}, G: {g}")
     
     priv_a = int(input("Ingresá la clave privada de ALICE (ej. 4): "))
@@ -147,28 +149,36 @@ def modulo_kdf_pesado():
     print("[+] Llave Argon2id (Hex):", key_argon.hex())
     print("[+] Llave PBKDF2-600k (Hex):", key_pbkdf2.hex())
 
+def modulo_chacha20():
+    print("\n--- 6. CIFRADO SIMÉTRICO: ChaCha20-Poly1305 ---")
+    mensaje = input("Ingresá el mensaje secreto a cifrar: ").encode('utf-8')
+    key, nonce = secrets.token_bytes(32), secrets.token_bytes(12)
+    ciphertext = ChaCha20Poly1305(key).encrypt(nonce, mensaje, None)
+    
+    print("\n[+] Llave (Base64):", base64.b64encode(key).decode())
+    print("[+] Nonce (Base64):", base64.b64encode(nonce).decode())
+    print("[+] Mensaje Cifrado (Base64):", base64.b64encode(ciphertext).decode())
+
 def modulo_descifrado_chacha20():
-    print("\n--- 6b. DESCIFRADO SIMÉTRICO: ChaCha20-Poly1305 ---")
+    print("\n--- 7. DESCIFRADO SIMÉTRICO: ChaCha20-Poly1305 ---")
     try:
         key_b64 = input("Ingresá la Llave (Base64): ")
         nonce_b64 = input("Ingresá el Nonce (Base64): ")
         ciphertext_b64 = input("Ingresá el Mensaje Cifrado (Base64): ")
         
-        # Traducimos de Base64 a bytes puros
         key = base64.b64decode(key_b64)
         nonce = base64.b64decode(nonce_b64)
         ciphertext = base64.b64decode(ciphertext_b64)
         
-        # Matemática inversa y verificación de integridad
         plaintext = ChaCha20Poly1305(key).decrypt(nonce, ciphertext, None)
         
         print("\n[+] ¡Candado abierto con éxito! La integridad fue verificada.")
         print("[+] Mensaje original:", plaintext.decode('utf-8'))
     except Exception as e:
         print("\n[!] Error de seguridad: El mensaje fue alterado, la llave es incorrecta o faltan datos.")
-
+        
 def modulo_hashes_rapidos():
-    print("\n--- 7. HASHES RÁPIDOS: SHA3 y BLAKE2 ---")
+    print("\n--- 8. HASHES RÁPIDOS: SHA3 y BLAKE2 ---")
     texto = input("Ingresá el texto: ").encode('utf-8')
     hash_sha3 = hashes.Hash(hashes.SHA3_256())
     hash_sha3.update(texto)
@@ -177,14 +187,119 @@ def modulo_hashes_rapidos():
     print("\n[+] SHA3-256 (Hex):", hash_sha3.finalize().hex())
     print("[+] BLAKE2b-512 (Hex):", hash_blake.finalize().hex())
 
+# =====================================================================
+# MÓDULOS 9 a 13: ECC, FIRMAS DIGITALES Y CERTIFICADOS X.509
+# =====================================================================
 def modulo_ecc():
-    print("\n--- 8. ASIMÉTRICO MODERNO: Curvas Elípticas (ECC) ---")
+    print("\n--- 9. ASIMÉTRICO MODERNO: Generar Llaves ECC ---")
     private_key = ec.generate_private_key(ec.SECP256R1())
+    public_key = private_key.public_key()
+    
     pem_priv = private_key.private_bytes(
         encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption()
     )
-    print("\n[+] Clave Privada ECC (NIST P-256):")
-    print(pem_priv.decode('utf-8'))
+    pem_pub = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    
+    Path("privada_ecc.pem").write_bytes(pem_priv)
+    Path("publica_ecc.pem").write_bytes(pem_pub)
+    print("\n[+] Llaves ECC (NIST P-256) generadas con éxito.")
+    print("[+] Guardadas en tu carpeta como: 'privada_ecc.pem' y 'publica_ecc.pem'")
+
+def modulo_firmar_ecc():
+    print("\n--- 10. FIRMA DIGITAL: Firmar mensaje (ECDSA) ---")
+    privkey = input("Ruta de la llave privada ECC (.pem) [ej. privada_ecc.pem]: ")
+    mensaje = input("Ingresá el mensaje a firmar: ").encode('utf-8')
+    
+    private_key = serialization.load_pem_private_key(Path(privkey).read_bytes(), password=None)
+    firma = private_key.sign(mensaje, ec.ECDSA(hashes.SHA256()))
+    
+    print("\n[+] Firma Digital generada (Base64):")
+    print(base64.b64encode(firma).decode('utf-8'))
+    print("\n[i] Entregale al destinatario el Mensaje, tu Llave Pública y esta Firma.")
+
+def modulo_verificar_ecc():
+    print("\n--- 11. FIRMA DIGITAL: Verificar firma (ECDSA) ---")
+    pubkey = input("Ruta de la llave pública ECC (.pem) [ej. publica_ecc.pem]: ")
+    mensaje = input("Ingresá el mensaje original: ").encode('utf-8')
+    firma_b64 = input("Ingresá la Firma (Base64): ")
+    
+    public_key = serialization.load_pem_public_key(Path(pubkey).read_bytes())
+    firma = base64.b64decode(firma_b64)
+    
+    try:
+        public_key.verify(firma, mensaje, ec.ECDSA(hashes.SHA256()))
+        print("\n[+] ¡Firma VÁLIDA! El mensaje es auténtico y pertenece al dueño de la llave.")
+    except InvalidSignature:
+        print("\n[!] ¡ALERTA DE SEGURIDAD! Firma inválida. El mensaje fue alterado o es un impostor.")
+
+def modulo_x509():
+    print("\n--- 12. IDENTIDAD DIGITAL: Generar Certificado X.509 ---")
+    print("Vamos a crear un certificado TLS/SSL (Firma X9.62 ECDSA con SHA-256).")
+    privkey = input("Ruta de tu llave privada ECC (.pem) [ej. privada_ecc.pem]: ")
+    
+    private_key = serialization.load_pem_private_key(Path(privkey).read_bytes(), password=None)
+    public_key = private_key.public_key()
+    
+    dominio = input("Ingresá tu dominio (ej. ugr.edu.ar): ")
+    org = input("Ingresá tu organización (ej. Ciberseguridad UGR): ")
+    
+    # Opción interactiva para definir el vencimiento a medida
+    dias_input = input("Ingresá los días de validez (ej. 365 para 1 año, 3650 para 10 años): ")
+    try:
+        dias_validez = int(dias_input)
+    except ValueError:
+        print("[!] Valor inválido. Se usarán 365 días por defecto.")
+        dias_validez = 365
+    
+    subject = issuer = x509.Name([
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, org),
+        x509.NameAttribute(NameOID.COMMON_NAME, dominio),
+    ])
+    
+    cert = x509.CertificateBuilder().subject_name(
+        subject
+    ).issuer_name(
+        issuer
+    ).public_key(
+        public_key
+    ).serial_number(
+        x509.random_serial_number()
+    ).not_valid_before(
+        datetime.datetime.now(datetime.timezone.utc)
+    ).not_valid_after(
+        # Acá se inyectan los días que elegiste en la consola
+        datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=dias_validez)
+    ).add_extension(
+        x509.SubjectAlternativeName([x509.DNSName(dominio)]),
+        critical=False,
+    ).sign(private_key, hashes.SHA256()) # FIRMA X9.62 ECDSA
+    
+    cert_pem = cert.public_bytes(serialization.Encoding.PEM)
+    Path("certificado_tls.pem").write_bytes(cert_pem)
+    
+    print(f"\n[+] Certificado X.509 generado exitosamente a nombre de '{dominio}'.")
+    print(f"[+] Validez configurada y sellada: {dias_validez} días.")
+    print("[+] Guardado como 'certificado_tls.pem'. ¡Listo para auditar!")
+
+def modulo_leer_x509():
+    print("\n--- 13. FORENSE: Analizar Certificado X.509 ---")
+    cert_path = input("Ruta del certificado (.pem) [ej. certificado_tls.pem]: ")
+    
+    try:
+        cert_data = Path(cert_path).read_bytes()
+        cert = x509.load_pem_x509_certificate(cert_data)
+        
+        print("\n[+] Análisis Forense del Certificado:")
+        print(f" - Sujeto (Dueño): {cert.subject}")
+        print(f" - Emisor (Autoridad): {cert.issuer}")
+        print(f" - Número de Serie: {cert.serial_number}")
+        print(f" - Algoritmo de Firma: {cert.signature_hash_algorithm.name.upper()} (X9.62)")
+        print(f" - Válido desde: {cert.not_valid_before_utc}")
+        print(f" - Válido hasta: {cert.not_valid_after_utc}")
+    except Exception as e:
+        print("\n[!] Error: El archivo no es un certificado X.509 válido o no está en formato PEM.")
 
 # =====================================================================
 # MENÚ PRINCIPAL
@@ -192,7 +307,7 @@ def modulo_ecc():
 def menu_principal():
     while True:
         print("\n" + "="*65)
-        print("   CRYPSTOFUS v7.0 - SUITE CRIPTOGRÁFICA INDUSTRIAL (UGR)")
+        print("   CRYPSTOFUS v9.0 - SUITE CRIPTOGRÁFICA INDUSTRIAL (UGR)")
         print("="*65)
         print("1. Aritmética Modular   -> Generar Primos (Rabin-Miller)")
         print("2. Diffie-Hellman       -> Intercambio Seguro de Claves")
@@ -202,11 +317,15 @@ def menu_principal():
         print("6. Cifrar ChaCha20      -> Cifrado Simétrico Móvil")
         print("7. Descifrar ChaCha20   -> Recuperar Mensaje Simétrico")
         print("8. Hashes Rápidos       -> SHA3 / BLAKE2 (Integridad)")
-        print("9. Asimétrico Moderno   -> Curvas Elípticas (ECC)")
-        print("10. Salir")
+        print("9. Generar Llaves ECC   -> Asimétrico Moderno (NIST P-256)")
+        print("10. Firmar Mensaje      -> Crear Firma Digital (ECDSA)")
+        print("11. Verificar Firma     -> Validar Autenticidad (ECDSA)")
+        print("12. Generar Certificado -> Identidad Digital (X.509 TLS)")
+        print("13. Analizar Certificado-> Forense de X.509")
+        print("14. Salir")
         print("="*65)
         
-        opcion = input("\n[?] Seleccioná un módulo (1-10): ")
+        opcion = input("\n[?] Seleccioná un módulo (1-14): ")
         clear_screen()
         
         if opcion == '1': modulo_primos()
@@ -218,10 +337,18 @@ def menu_principal():
         elif opcion == '7': modulo_descifrado_chacha20()
         elif opcion == '8': modulo_hashes_rapidos()
         elif opcion == '9': modulo_ecc()
-        elif opcion == '10': 
+        elif opcion == '10': modulo_firmar_ecc()
+        elif opcion == '11': modulo_verificar_ecc()
+        elif opcion == '12': modulo_x509()
+        elif opcion == '13': modulo_leer_x509()
+        elif opcion == '14': 
             print("Cerrando Crypstofus. ¡Excelente trabajo!")
             break
         else: print("[!] Opción inválida.")
         
         input("\n[Presioná ENTER para volver al menú principal...]")
         clear_screen()
+        
+if __name__ == "__main__":
+    clear_screen()
+    menu_principal()
