@@ -2,21 +2,22 @@
 
 ## Versiones Soportadas
 
-Actualmente, solo la versión más reciente recibe parches de seguridad y actualizaciones de algoritmos.
+Actualmente, solo la versión más reciente recibe parches de seguridad y actualizaciones de algoritmos y estándares criptográficos.
 
 | Versión | Soportada          |
 | ------- | ------------------ |
-| v7.0.x  | :white_check_mark: |
-| < v6.0  | :x:                |
+| v9.0.x  | :white_check_mark: |
+| < v8.0  | :x:                |
 
-## Principios Criptográficos Aplicados
+## Principios Criptográficos Aplicados en v9.0
 
-En la versión 7.0, Crypstofus implementa estrictamente las siguientes defensas:
+Crypstofus implementa estrictamente las siguientes defensas modernas:
 
-*   **Entropía Verdadera:** Sustitución de la librería `random` por `secrets` (CSPRNG) para toda generación de claves, nonces y sales (salts), previniendo ataques de predicción.
-*   **Mitigación de Padding Oracles:** RSA utiliza exclusivamente el esquema de relleno OAEP con MGF1 y SHA-256.
-*   **Integridad Autenticada (AEAD):** Todos los cifrados simétricos (AES y ChaCha20) implementan autenticación de mensajes por hardware/software (GCM y Poly1305) para prevenir la manipulación del texto cifrado (Ciphertext Malleability).
-*   **Resistencia a Fuerza Bruta:** Uso del estándar Argon2id (recomendado por NIST) para la protección de contraseñas.
+*   **Entropía Verdadera:** Sustitución de generadores débiles por `secrets` (CSPRNG) para nonces, sales y parámetros aleatorios.
+*   **Mitigación de Oráculos:** RSA utiliza exclusivamente el esquema de relleno OAEP con MGF1 y SHA-256.
+*   **Integridad Autenticada (AEAD):** Algoritmos simétricos (AES-GCM y ChaCha20-Poly1305) para prevenir la manipulación del texto cifrado.
+*   **Resistencia a Fuerza Bruta:** Uso del estándar Argon2id recomendado por NIST para KDFs de contraseñas.
+*   **Estándares Modernos de Identidad:** Soporte completo de Curvas Elípticas (NIST P-256), firmas ECDSA y parsing de certificados X.509 (TLS).
 
 ## Reporte de Vulnerabilidades
 

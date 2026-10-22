@@ -1,27 +1,32 @@
-# Crypstofus v7.0 - Suite Criptográfica Industrial
+# Crypstofus v9.0 - Suite Criptográfica e Industrial Avanzada
 
-**Crypstofus** es una suite criptográfica interactiva y avanzada desarrollada en Python. Diseñada para profesionales de la ciberseguridad, fusiona la matemática pura (aritmética modular) con los estándares modernos de cifrado de grado industrial en una única interfaz unificada.
+**Crypstofus** es una suite criptográfica interactiva y avanzada desarrollada en Python. Diseñada para profesionales de la ciberseguridad, analistas SOC y entusiastas de la criptografía, fusiona la matemática pura con los estándares modernos de cifrado de grado industrial en una única interfaz unificada por consola.
 
 ---
 
-## 🚀 Características Principales (v7.0)
+## 🚀 Características Principales (v9.0)
 
-La suite cuenta con 8 módulos interactivos:
+La suite cuenta con 13 módulos operativos independientes:
 
-1. **Aritmética Modular (Rabin-Miller)**: Generación de números primos seguros de gran tamaño (ej. 2048 bits) eludiendo la ineficiencia de la fuerza bruta pura.
-2. **Diffie-Hellman (Merkle)**: Simulación de intercambio seguro de claves matemáticas sobre redes públicas sin transmitir el secreto.
-3. **Cifrado Híbrido (AES-GCM + RSA-OAEP)**: Encriptación de archivos unificando la velocidad de AES de 256 bits con el blindaje asimétrico de claves RSA.
-4. **Descifrado Híbrido**: Verificación de integridad (vía etiquetas de autenticación Galois) y apertura de cofres JSON.
-5. **KDF Pesado (Argon2 / PBKDF2)**: Derivación de claves diseñada para consumir RAM/CPU y resistir ataques masivos de fuerza bruta por GPU y algoritmos de Grover.
-6. **Cifrado Simétrico Móvil (ChaCha20-Poly1305)**: Implementación del algoritmo AEAD ultrarrápido preferido en conexiones HTTPS móviles modernas.
-7. **Hashes de Integridad (SHA3 / BLAKE2)**: Funciones de resumen criptográfico de última generación para verificación de descargas y blockchains.
-8. **Asimétrico Moderno (ECC)**: Generación de pares de claves de Curvas Elípticas (NIST P-256) en formato PEM.
+1. **Aritmética Modular (Rabin-Miller)**: Generación de números primos seguros de gran tamaño eludiendo la fuerza bruta pura.
+2. **Diffie-Hellman (Merkle)**: Simulación de intercambio seguro de claves matemáticas sobre redes públicas.
+3. **Cifrado Híbrido (AES-GCM + RSA-OAEP)**: Encriptación de archivos unificando velocidad simétrica y blindaje asimétrico.
+4. **Descifrado Híbrido**: Apertura de cofres JSON con verificación estricta de integridad (Galois).
+5. **KDF Pesado (Argon2id / PBKDF2)**: Derivación de claves diseñada para consumir RAM/CPU y frenar ataques masivos de GPU.
+6. **Cifrado Simétrico Móvil (ChaCha20-Poly1305)**: Implementación del algoritmo AEAD ultrarrápido preferido en conexiones móviles.
+7. **Descifrado ChaCha20**: Apertura de mensajes simétricos verificando Nonce, Llave y Tag de integridad.
+8. **Hashes Rápidos (SHA3 / BLAKE2)**: Funciones de resumen criptográfico unidireccionales para auditoría forense y cadenas de bloques.
+9. **Asimétrico Moderno ECC**: Generación de pares de llaves de Curvas Elípticas (NIST P-256 / SECP256R1) en formato PEM.
+10. **Firma Digital (ECDSA)**: Creación de firmas de no repudio sobre mensajes usando llaves ECC y SHA-256.
+11. **Verificación de Firmas**: Validación matemática de autenticidad para detectar alteraciones en los datos.
+12. **Identidad Digital (X.509 TLS)**: Fábrica de certificados digitales autofirmados (Firma X9.62 ECDSA) con validez temporal configurable.
+13. **Análisis Forense X.509**: Escáner interno para inspeccionar sujetos, emisores, números de serie y algoritmos de certificados TLS.
 
 ---
 
 ## 🛠️ Instalación y Uso
 
-Clona el repositorio e instala la única dependencia moderna requerida (`cryptography`):
+Clona el repositorio e instala la única librería moderna requerida (`cryptography`):
 
 ```bash
 git clone [https://github.com/tolotelin99/crypstofus.git](https://github.com/tolotelin99/crypstofus.git)
