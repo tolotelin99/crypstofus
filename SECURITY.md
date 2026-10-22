@@ -1,25 +1,25 @@
-# Política de Seguridad
+```bash
+cat << 'EOF' > SECURITY.md
+# Políticas de Seguridad de Crypstofus
 
 ## Versiones Soportadas
 
-Se ofrece soporte activo para la serie de versiones estables actuales de Crypstofus.
+Actualmente, solo la versión más reciente recibe parches de seguridad y actualizaciones de algoritmos.
 
-| Versión | Soportada |
-| ------- | --------- |
-| v3.x    | Sí        |
-| < v3.0  | No        |
+| Versión | Soportada          |
+| ------- | ------------------ |
+| v7.0.x  | :white_check_mark: |
+| < v6.0  | :x:                |
 
----
+## Principios Criptográficos Aplicados
+
+En la versión 7.0, Crypstofus implementa estrictamente las siguientes defensas:
+
+*   **Entropía Verdadera:** Sustitución de la librería `random` por `secrets` (CSPRNG) para toda generación de claves, nonces y sales (salts), previniendo ataques de predicción.
+*   **Mitigación de Padding Oracles:** RSA utiliza exclusivamente el esquema de relleno OAEP con MGF1 y SHA-256.
+*   **Integridad Autenticada (AEAD):** Todos los cifrados simétricos (AES y ChaCha20) implementan autenticación de mensajes por hardware/software (GCM y Poly1305) para prevenir la manipulación del texto cifrado (Ciphertext Malleability).
+*   **Resistencia a Fuerza Bruta:** Uso del estándar Argon2id (recomendado por NIST) para la protección de contraseñas.
 
 ## Reporte de Vulnerabilidades
 
-Si descubre una vulnerabilidad de seguridad o un defecto crítico en Crypstofus, absténgase de divulgarlo públicamente a través de los problemas abiertos del repositorio de manera inmediata. La divulgación responsable garantiza una mitigación adecuada y mantiene la integridad del proyecto.
-
----
-
-## Uso Ético y Legal
-
-Crypstofus se ha desarrollado exclusivamente con fines educativos, de auditoría de seguridad autorizada y de ingeniería de software defensiva.
-
-* El autor (tolotelin99) no asume ninguna responsabilidad por el uso indebido, daños o actividades ilegales realizadas con esta utilidad.
-* Los usuarios deben asegurarse de contar con una autorización explícita y por escrito antes de realizar pruebas en cualquier sistema o red que no pertenezca a sus propios entornos controlados.
+Si descubrís una vulnerabilidad, por favor no crees un Issue público. Enviá un reporte detallado al administrador del repositorio.
