@@ -147,13 +147,25 @@ def modulo_kdf_pesado():
     print("[+] Llave Argon2id (Hex):", key_argon.hex())
     print("[+] Llave PBKDF2-600k (Hex):", key_pbkdf2.hex())
 
-def modulo_chacha20():
-    print("\n--- 6. CIFRADO SIMÉTRICO: ChaCha20-Poly1305 ---")
-    mensaje = input("Ingresá el mensaje secreto a cifrar: ").encode('utf-8')
-    key, nonce = secrets.token_bytes(32), secrets.token_bytes(12)
-    ciphertext = ChaCha20Poly1305(key).encrypt(nonce, mensaje, None)
-    print("\n[+] Llave (Base64):", base64.b64encode(key).decode())
-    print("[+] Mensaje Cifrado (Base64):", base64.b64encode(ciphertext).decode())
+def modulo_descifrado_chacha20():
+    print("\n--- 6b. DESCIFRADO SIMÉTRICO: ChaCha20-Poly1305 ---")
+    try:
+        key_b64 = input("Ingresá la Llave (Base64): ")
+        nonce_b64 = input("Ingresá el Nonce (Base64): ")
+        ciphertext_b64 = input("Ingresá el Mensaje Cifrado (Base64): ")
+        
+        # Traducimos de Base64 a bytes puros
+        key = base64.b64decode(key_b64)
+        nonce = base64.b64decode(nonce_b64)
+        ciphertext = base64.b64decode(ciphertext_b64)
+        
+        # Matemática inversa y verificación de integridad
+        plaintext = ChaCha20Poly1305(key).decrypt(nonce, ciphertext, None)
+        
+        print("\n[+] ¡Candado abierto con éxito! La integridad fue verificada.")
+        print("[+] Mensaje original:", plaintext.decode('utf-8'))
+    except Exception as e:
+        print("\n[!] Error de seguridad: El mensaje fue alterado, la llave es incorrecta o faltan datos.")
 
 def modulo_hashes_rapidos():
     print("\n--- 7. HASHES RÁPIDOS: SHA3 y BLAKE2 ---")
@@ -187,13 +199,14 @@ def menu_principal():
         print("3. Cifrado Híbrido      -> Encriptar (RSA + AES-GCM)")
         print("4. Descifrado Híbrido   -> Desencriptar JSON")
         print("5. KDF Pesado           -> Proteger contraseñas (Argon2)")
-        print("6. Cifrado Simétrico    -> ChaCha20-Poly1305 (Móviles)")
-        print("7. Hashes Rápidos       -> SHA3 / BLAKE2 (Integridad)")
-        print("8. Asimétrico Moderno   -> Curvas Elípticas (ECC)")
-        print("9. Salir")
+        print("6. Cifrar ChaCha20      -> Cifrado Simétrico Móvil")
+        print("7. Descifrar ChaCha20   -> Recuperar Mensaje Simétrico")
+        print("8. Hashes Rápidos       -> SHA3 / BLAKE2 (Integridad)")
+        print("9. Asimétrico Moderno   -> Curvas Elípticas (ECC)")
+        print("10. Salir")
         print("="*65)
         
-        opcion = input("\n[?] Seleccioná un módulo (1-9): ")
+        opcion = input("\n[?] Seleccioná un módulo (1-10): ")
         clear_screen()
         
         if opcion == '1': modulo_primos()
@@ -202,16 +215,13 @@ def menu_principal():
         elif opcion == '4': modulo_descifrado_hibrido()
         elif opcion == '5': modulo_kdf_pesado()
         elif opcion == '6': modulo_chacha20()
-        elif opcion == '7': modulo_hashes_rapidos()
-        elif opcion == '8': modulo_ecc()
-        elif opcion == '9': 
+        elif opcion == '7': modulo_descifrado_chacha20()
+        elif opcion == '8': modulo_hashes_rapidos()
+        elif opcion == '9': modulo_ecc()
+        elif opcion == '10': 
             print("Cerrando Crypstofus. ¡Excelente trabajo!")
             break
         else: print("[!] Opción inválida.")
         
         input("\n[Presioná ENTER para volver al menú principal...]")
         clear_screen()
-
-if __name__ == "__main__":
-    clear_screen()
-    menu_principal()
