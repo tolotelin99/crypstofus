@@ -1,5 +1,3 @@
-```bash
-cat << 'EOF' > SECURITY.md
 # Políticas de Seguridad de Crypstofus
 
 ## Versiones Soportadas
