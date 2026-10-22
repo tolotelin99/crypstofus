@@ -6,10 +6,10 @@ Actualmente, solo la versión más reciente recibe parches de seguridad y actual
 
 | Versión | Soportada          |
 | ------- | ------------------ |
-| v9.0.x  | :white_check_mark: |
-| < v8.0  | :x:                |
+| v10.0.x | :white_check_mark: |
+| < v9.0  | :x:                |
 
-## Principios Criptográficos Aplicados en v9.0
+## Principios Criptográficos Aplicados en v10.0
 
 Crypstofus implementa estrictamente las siguientes defensas modernas:
 
@@ -17,7 +17,7 @@ Crypstofus implementa estrictamente las siguientes defensas modernas:
 *   **Mitigación de Oráculos:** RSA utiliza exclusivamente el esquema de relleno OAEP con MGF1 y SHA-256.
 *   **Integridad Autenticada (AEAD):** Algoritmos simétricos (AES-GCM y ChaCha20-Poly1305) para prevenir la manipulación del texto cifrado.
 *   **Resistencia a Fuerza Bruta:** Uso del estándar Argon2id recomendado por NIST para KDFs de contraseñas.
-*   **Estándares Modernos de Identidad:** Soporte completo de Curvas Elípticas (NIST P-256), firmas ECDSA y parsing de certificados X.509 (TLS).
+*   **Estándares Modernos de Identidad y Navegadores:** Soporte completo de Curvas Elípticas (NIST P-256), firmas ECDSA, parsing X.509 (TLS) y validación cruzada para motores de Chromium, Firefox y Tor.
 
 ## Reporte de Vulnerabilidades
 
