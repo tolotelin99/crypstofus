@@ -15,7 +15,7 @@
 * **Ingeniería de Bytes y Criptoanálisis Clásico (Módulos 15 y 16):** Utilidades de conversión e inspección de estructuras binarias, hexadecimales y ASCII, junto con herramientas analíticas para cifrados de sustitución histórica como el cifrado *César*.
 * **Motor de Hashing y Auditoría de Contraseñas (Módulo 19 - Estilo Hashcat / John):**
   * **Cálculo de Hashes:** Generación de resúmenes criptográficos *SHA-256*.
-  * **Ataque por Diccionario Híbrido:** Soporte avanzado para listas internas preconfiguradas (CrackStation / SecLists), carga de diccionarios locales `.txt` y **Streaming Web optimizado** que procesa archivos directamente desde enlaces *Raw* de GitHub renglón por renglón en memoria RAM, evitando descargas innecesarias al disco.
+  * **Ataque por Diccionario Híbrido:** Soporte avanzado para listas internas preconfiguradas (CrackStation / SecLists), carga de archivos locales `.txt` y **Streaming Web optimizado** que procesa archivos directamente desde enlaces *Raw* de GitHub renglón por renglón en memoria RAM, evitando descargas innecesarias al disco.
   * **Ataque Algorítmico al Vuelo:** Generación combinatoria matemática en tiempo real mediante `itertools` con rangos de búsqueda ampliados para PINs numéricos y patrones alfanuméricos complejos.
 
 ---
@@ -47,11 +47,12 @@
 
 ## 📦 Instalación y Ejecución
 
-Cloná el repositorio y ejecutá el script principal:
+Cloná el repositorio, instalá las dependencias necesarias y ejecutá el script principal:
 
 ```bash
 git clone [https://github.com/tolotelin99/crypstofus.git](https://github.com/tolotelin99/crypstofus.git)
 cd crypstofus
+pip install -r requirements.txt
 python crypstofus.py
 🛠️ Stack Tecnológico
 Lenguaje: Python 3.x
