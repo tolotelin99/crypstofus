@@ -1,24 +1,11 @@
-# Políticas de Seguridad de Crypstofus
 
-## Versiones Soportadas
+Política de Seguridad / Security Policy
+🔒 Uso Académico y Ético
+Crypstofus es una herramienta desarrollada estrictamente con fines educativos, de investigación y de auditoría de seguridad defensiva en el marco de la Tecnicatura Universitaria en Ciberseguridad (UGR).
 
-Actualmente, solo la versión más reciente recibe parches de seguridad y actualizaciones de algoritmos y estándares criptográficos.
+El uso de las funciones de auditoría de contraseñas y hashing debe realizarse únicamente sobre sistemas propios o bajo autorización explícita y por escrito.
 
-| Versión | Soportada          |
-| ------- | ------------------ |
-| v10.0.x | :white_check_mark: |
-| < v9.0  | :x:                |
+El autor no se hace responsable por el uso indebido de este software contra infraestructuras ajenas.
 
-## Principios Criptográficos Aplicados en v10.0
-
-Crypstofus implementa estrictamente las siguientes defensas modernas:
-
-*   **Entropía Verdadera:** Sustitución de generadores débiles por `secrets` (CSPRNG) para nonces, sales y parámetros aleatorios.
-*   **Mitigación de Oráculos:** RSA utiliza exclusivamente el esquema de relleno OAEP con MGF1 y SHA-256.
-*   **Integridad Autenticada (AEAD):** Algoritmos simétricos (AES-GCM y ChaCha20-Poly1305) para prevenir la manipulación del texto cifrado.
-*   **Resistencia a Fuerza Bruta:** Uso del estándar Argon2id recomendado por NIST para KDFs de contraseñas.
-*   **Estándares Modernos de Identidad y Navegadores:** Soporte completo de Curvas Elípticas (NIST P-256), firmas ECDSA, parsing X.509 (TLS) y validación cruzada para motores de Chromium, Firefox y Tor.
-
-## Reporte de Vulnerabilidades
-
-Si descubrís una vulnerabilidad, por favor no crees un Issue público. Enviá un reporte detallado al administrador del repositorio.
+🛡️ Reporte de Vulnerabilidades
+Si encontrás alguna vulnerabilidad o querés sugerir mejoras de hardening en el código, por favor contactate a través del repositorio de GitHub (tolotelin99).
