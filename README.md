@@ -1,17 +1,26 @@
 # Crypstofus v10.0 🛡️🔐
 
-**Crypstofus** es una suite criptográfica modular, portátil y de alto rendimiento diseñada con fines académicos y de auditoría de seguridad (UGR). Su enfoque principal es la eficiencia, un uso mínimo de recursos y la implementación de lógica autosuficiente sin dependencias pesadas de terceros.
+**Crypstofus** es una suite criptográfica modular, portátil y de alto rendimiento diseñada con fines académicos y de auditoría de seguridad (UGR). Su arquitectura prioriza la eficiencia algorítmica, un consumo mínimo de recursos en entornos Windows y una implementación robusta basada en primitivas criptográficas estándar sin dependencias innecesarias.
 
-## 🚀 Características Principales
+---
 
-* **Aritmética Modular & Criptografía Clásica/Moderna:** Módulos avanzados de RSA, Rabin-Miller, Curvas Elípticas (ECC) y cifrado híbrido AES-GCM + ChaCha20.
-* **Infraestructura de Clave Pública (PKI):** Generación, validación y auditoría de certificados X.509 y flujos TLS.
-* **Módulo de Hashing y Auditoría de Contraseñas (Estilo Hashcat / John):**
-  * Cálculo de hashes SHA-256.
-  * **Ataque por Diccionario Híbrido:** Soporta listas internas avanzadas (CrackStation/SecLists master top), lectura de archivos locales `.txt` y **Streaming Web directo** desde enlaces *Raw* de GitHub sin necesidad de descargar archivos locales.
-  * **Ataque Algorítmico al Vuelo:** Generación matemática optimizada mediante `itertools` con rangos ampliados para PINs numéricos y patrones alfanuméricos.
+## 🚀 Arquitectura y Características Técnicas de los Módulos
 
-## 📋 Módulos Disponibles en la Suite
+* **Módulos de Aritmética Modular y Primos (1 y 17):** Implementación de pruebas de primalidad probabilísticas mediante el test de *Rabin-Miller* y algoritmos optimizados de cribado para la generación segura de números primos requeridos en esquemas de clave asimétrica.
+* **Protocolo Diffie-Hellman e Intercambio de Claves (Módulo 2):** Establecimiento seguro de secretos compartidos sobre canales no seguros mediante aritmética de grupos cíclicos discretos.
+* **Cifrado Híbrido Asimétrico/Simétrico (Módulos 3 y 4):** Mecanismo de encapsulado de claves combinando *RSA* para el intercambio seguro del secreto y *AES-GCM* (Galois/Counter Mode) para la confidencialidad y autenticación de cargas útiles serializadas en JSON.
+* **Derivación de Claves (KDF) y Cifrado de Flujo (Módulos 5, 6 y 7):** Integración de funciones de derivación robustas resistentes a ataques de fuerza bruta (*Argon2*) y cifrado simétrico de alta velocidad optimizado para entornos móviles o de recursos acotados mediante *ChaCha20*.
+* **Integridad, Criptografía Asimétrica y Firmas (Módulos 8, 9, 10 y 11):** Funciones hash de alta velocidad para integridad (*SHA3* y *BLAKE2*), generación de pares de claves asimétricas basadas en curvas elípticas (*NIST P-256 / ECC*), y emisión/verificación de firmas digitales mediante *ECDSA*.
+* **Infraestructura de Clave Pública (PKI) y Forense (Módulos 12, 13, 14 y 18):** Generación de identidades digitales y certificados autofirmados (*X.509 TLS*), análisis forense detallado de campos de certificados, herramientas de auditoría de compatibilidad de cifrado para navegadores (*Chrome, Firefox, Tor*) y un visualizador gráfico interactivo para la geometría de curvas elípticas.
+* **Ingeniería de Bytes y Criptoanálisis Clásico (Módulos 15 y 16):** Utilidades de conversión e inspección de estructuras binarias, hexadecimales y ASCII, junto con herramientas analíticas para cifrados de sustitución histórica como el cifrado *César*.
+* **Motor de Hashing y Auditoría de Contraseñas (Módulo 19 - Estilo Hashcat / John):**
+  * **Cálculo de Hashes:** Generación de resúmenes criptográficos *SHA-256*.
+  * **Ataque por Diccionario Híbrido:** Soporte avanzado para listas internas preconfiguradas (CrackStation / SecLists), carga de diccionarios locales `.txt` y **Streaming Web optimizado** que procesa archivos directamente desde enlaces *Raw* de GitHub renglón por renglón en memoria RAM, evitando descargas innecesarias al disco.
+  * **Ataque Algorítmico al Vuelo:** Generación combinatoria matemática en tiempo real mediante `itertools` con rangos de búsqueda ampliados para PINs numéricos y patrones alfanuméricos complejos.
+
+---
+
+## 📋 Índice de Opciones del Menú
 
 1. **Aritmética Modular** -> Generar Primos (Rabin-Miller)
 2. **Diffie-Hellman** -> Intercambio Seguro de Claves
@@ -34,6 +43,8 @@
 19. **Hashing & Auditar** -> SHA-256 & Fuerza Bruta de Contraseñas
 20. **Salir**
 
+---
+
 ## 📦 Instalación y Ejecución
 
 Cloná el repositorio y ejecutá el script principal:
@@ -42,7 +53,9 @@ Cloná el repositorio y ejecutá el script principal:
 git clone [https://github.com/tolotelin99/crypstofus.git](https://github.com/tolotelin99/crypstofus.git)
 cd crypstofus
 python crypstofus.py
-🛠️ Tecnologías Utilizadas
-Python 3.x
+🛠️ Stack Tecnológico
+Lenguaje: Python 3.x
 
-Librerías nativas/estándar: cryptography, hashlib, itertools, urllib, os, time, string.
+Librerías Nativas y Estándar: hashlib, itertools, urllib, os, time, string
+
+Librería Criptográfica Externa: cryptography
